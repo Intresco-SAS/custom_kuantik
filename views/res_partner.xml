@@ -1,0 +1,14 @@
+<odoo>
+  <data>
+    <record id="view_partner_form_kuantik" model="ir.ui.view">
+      <field name="name">view.partner.form.kuantik</field>
+      <field name="inherit_id" ref="base.view_partner_form" />
+      <field name="model">res.partner</field>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='function']" position="replace">
+          <field name="profession_id"/>
+        </xpath>
+      </field>
+    </record>
+  </data>
+</odoo>
