@@ -4,7 +4,7 @@
         <report 
             id="payment_report_custom"
             string="Reporte de Pago POS"
-            model="account.invoice" 
+            model="account.payment" 
             report_type="qweb-pdf"
             file="custom_kuantik.payment_receipt_pos_inherit" 
             name="custom_kuantik.payment_receipt_pos_inherit"
