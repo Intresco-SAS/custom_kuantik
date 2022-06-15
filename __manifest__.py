@@ -26,7 +26,9 @@
         'security/ir.model.access.csv',
         'views/res_partner.xml',
         'views/templates.xml',
+        'views/paper_format_pos.xml',
         'report/sale_order_report.xml',
+        'report/payment_report_pos.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
