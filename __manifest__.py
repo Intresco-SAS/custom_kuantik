@@ -28,7 +28,7 @@
         'views/templates.xml',
         'views/paper_format_pos.xml',
         'report/sale_order_report.xml',
-        'report/payment_report_pos.xml'
+        'report/payment_receipt_pos_inherit.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <report 
+            id="payment_report_pos"
+            string="Recibo de pago POS"
+            model="account.payment" 
+            report_type="qweb-pdf"
+            file="custom_kuantik.payment_receipt_pos_inherit" 
+            name="custom_kuantik.payment_receipt_pos_inherit"
+			paperformat="custom_kuantik.pos_paper_format_kuantik"        
+        />
+
+		<template id="payment_receipt_pos_inherit">
+		<t t-if="not o" t-set="o" t-value="doc"/>
+
+		<t t-if="not company">
+			<!-- Multicompany -->
+			<t t-if="company_id">
+				<t t-set="company" t-value="company_id"/>
+			</t>
+			<t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+				<t t-set="company" t-value="o.company_id.sudo()"/>
+			</t>
+			<t t-else="else">
+				<t t-set="company" t-value="res_company"/>
+			</t>
+		</t>
+
+		<div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+			
+				<!--div class="col-3 mb4">
+					<img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="max-height: 45px;" alt="Logo"/>
+				</div-->
+			<!--div class="col-9 text-right" style="margin-top:22px;" t-field="company.report_header" name="moto"/-->
+			
+			
+			<div name="company_address">
+				<div class="text-center" style="font-size: 17px;border:1px solid black">    
+					<strong><span t-field="company.partner_id.name"/></strong><br/> 
+					IMPUESTO SOBRE LAS VENTAS - IVA <br/>
+					NIT: <span t-field="company.partner_id.formatedNit"/><br/>  
+					<i class="fa fa-building-o"/> <span t-field="company.partner_id.street"/> <br/> 
+					<p> <i class="fa fa-mobile"/> <span t-field="company.partner_id.mobile"/> | <i class="fa fa-phone"/> <span t-field="company.phone"/></p>
+				</div>
+			</div>
+			
+		</div>
+
+		<t t-call="web.html_container">
+        <t t-foreach="docs" t-as="o">
+			<t t-set="lang" t-value="o.partner_id.lang or o.company_id.partner_id.lang"/>	
+			<t t-set="o" t-value="o.with_context(lang=lang)"/>
+			<div class="page" style="font-size: 17px">
+				<div style="border:1px solid black">
+					<div style="border-left:1px solid black" align="center">
+						<t t-if="o.partner_type == 'customer'">
+                            <strong>COMPROBANTE DE INGRESO</strong><br/>
+                            <strong>RECIBO DE CAJA No.: <span style="text-center" t-field="o.name"/></strong>
+						</t>
+						<t t-if="o.partner_type == 'supplier'">
+                            <strong>COMPROBANTE DE EGRESO</strong><br/>
+                            <strong>EGRESO No.: <span style="text-center" t-field="o.name"/></strong>
+						</t>
+					</div>
+					
+				</div>
+
+				<div style="border:1px solid black;margin-top:10px;margin-bottom:10px">
+					<div t-if="o.partner_type">
+						<t t-if="o.partner_type == 'customer'">
+							<span>Cliente: </span>
+						</t>
+						<t t-if="o.partner_type == 'supplier'">
+							<span>Proveedor: </span>
+						</t>
+						<span t-field="o.partner_id"/><br/>
+						NIT/C.C:<span t-if="o.partner_id.formatedNit"><span t-field="o.partner_id.formatedNit"/></span>
+								<t t-else="">
+								<span t-if="o.partner_id.xidentification"><span t-field="o.partner_id.xidentification"/></span>
+								</t><br/>
+						<span>Dirección.:</span> <span t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></span><br/>
+						<span>Tel.: </span> <span t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/>,</span><span t-if="o.partner_id.mobile"><span t-field="o.partner_id.mobile"/></span><br/>
+						<span>Correo: </span> <span t-if="o.partner_id.email"><span t-field="o.partner_id.email"/></span> <br/>
+						<span t-if="o.partner_id.city"><span>Ciudad: </span> <span t-field="o.partner_id.city"/></span><br/>
+					</div>
+                    <div>
+                        <t t-if="o.date"><span>Fecha de Pago: </span> <span t-field="o.date"/></t><br/>
+                        <t t-if="o.payment_method_id"><span>Método de Pago: </span><span t-field="o.journal_id"/></t><br/>
+                        <t t-if="o.amount"><span>Cantidad Pagada: </span><span t-field="o.amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></t>			
+                    </div>
+					<!--t t-if="o.partner_type == 'supplier'">
+					<div t-if="o.communication">
+						<strong>REF. PROVEEDOR: </strong><span t-field="o.communication"/>
+					</div>
+					</t>
+					<t t-if="o.partner_type == 'customer'">
+					<div t-if="o.communication">
+						<strong>REFERENCIA: </strong><span t-field="o.communication"/>
+					</div>
+					</t-->
+				</div>	
+                <div>
+                    <table class="table table-sm" style="font-size: 17px;border:1px solid black">
+                        <thead>
+                            <tr>
+                                <th><span>FECHA DE FACTURA</span></th>
+                                <th><span>NÚMERO DE FACTURA</span></th>
+                                <!--th><span>REF.</span></th-->
+                                <!--th class="text-right"><span>VALOR ORIGINAL</span></th-->
+                                <!--th class="text-right"><span>CANTIDAD PAGADA</span></th-->
+                                <th class="text-right"><span>BALANCE</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="o.move_id._get_reconciled_invoices_partials()" t-as="rec">
+                                <t t-set="amount" t-value="rec[1]"/>
+                                <t t-set="inv" t-value="rec[2].move_id"/>
+                                <t t-if="inv.move_type != 'entry'">
+                                    <td><span t-field="inv.invoice_date"/></td>
+                                    <td><span t-field="inv.name"/></td>
+                                    <!--td><span t-field="inv.ref"/></td-->
+                                    <!--td class="text-right"><span t-field="inv.amount_total"/></td!-->
+                                    <!--td class="text-right"><span t-esc="amount" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td-->
+                                    <td class="text-right"><span t-field="inv.amount_residual"/></td>
+                                </t>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="row" style="border:1px solid black;margin-top:10px">
+					<div class="col-12">
+						<b>Valor en Letras: </b><span t-esc="o.currency_id.amount_to_text(o.amount)"/>s
+					</div>
+				</div>
+
+                <div class="row" style="margin-top:30px">
+					<div class="col-4" align="center">
+						____________________________<br/>
+						ACEPTADA, FIRMADA Y/O SELLO 
+					</div><br/>
+					<div class="col-4" align="center">
+						____________________________<br/>
+						FECHA
+					</div>
+				</div>	
+			</div>
+		</t>
+		</t>
+
+
+		</template>
+	</data>
+</odoo>
+           
