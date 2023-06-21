@@ -19,13 +19,16 @@
     'version': '0.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','payment_report_co'],
 
     # always loaded
     'data': [
         'security/ir.model.access.csv',
         'views/res_partner.xml',
         'views/templates.xml',
+        'views/paper_format_pos.xml',
+        'report/sale_order_report.xml',
+        'report/payment_receipt_pos_inherit.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

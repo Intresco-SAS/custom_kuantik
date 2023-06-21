@@ -12,5 +12,5 @@ class ProfessionPartner(models.Model):
 class PartnerProfessionExtended(models.Model):
     _inherit = 'res.partner'
 
-    profession_id = fields.Many2one('res.partner.profession', string='profession')
+    profession_id = fields.Many2one('res.partner.profession', string='Profesión')
     
